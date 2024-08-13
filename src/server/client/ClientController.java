@@ -1,7 +1,9 @@
 package server.client;
 
+import server.server.ServerController;
+
 /**
- * класс содержащий логику работы клиента
+ * Класс содержащий логику работы клиента
  *
  * @clientView абстракция графического интерфейса
  * @server объект для связи с сервером
@@ -24,7 +26,7 @@ public class ClientController {
     /**
      * Метод попытки подключения к серверу. Вызывается из GUI
      * @param name имя пользователя, которым будем подписывать исходящие сообщения
-     * @return ответ от сервера. true, если прошли авторизацию
+     * @return ответ от сервера. True, если прошли авторизацию
      */
     public boolean connectToServer(String name) {
         this.name = name;
@@ -43,7 +45,7 @@ public class ClientController {
     }
 
     /**
-     * Метод отключения от сервера инициализированное сервером
+     * Метод отключения от сервера инициализированное сервером.
      */
     public void disconnectedFromServer() {
         if (connected) {
@@ -54,7 +56,7 @@ public class ClientController {
     }
 
     /**
-     * Метод отключения от сервера инициализированное клиентом (например закрыто GUI)
+     * Метод отключения от сервера инициализированное клиентом (например, закрытие GUI).
      */
     public void disconnectFromServer() {
         server.disconnectUser(this);

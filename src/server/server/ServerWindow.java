@@ -12,20 +12,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 //класс требуется разделить на GUI, controller и repository (смотри схему проекта)
-public class ServerWindow extends JFrame {
+public class ServerWindow extends JFrame implements ServerView {
     public static final int WIDTH = 400;
     public static final int HEIGHT = 300;
     public static final String LOG_PATH = "src/server/log.txt";
 
     List<ClientGUI> clientGUIList;
-
     JButton btnStart, btnStop;
     JTextArea log;
     boolean work;
+    private ServerController serverController;
+
 
     public ServerWindow(){
         clientGUIList = new ArrayList<>();
-
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(WIDTH, HEIGHT);
         setResizable(false);
@@ -35,6 +35,11 @@ public class ServerWindow extends JFrame {
         createPanel();
 
         setVisible(true);
+    }
+
+    // Устанавливаем контроллер сервера
+    public void setServerController(ServerController serverController) {
+        this.serverController = serverController;
     }
 
     public boolean connectUser(ClientGUI clientGUI){
@@ -101,7 +106,7 @@ public class ServerWindow extends JFrame {
 
     private void createPanel() {
         log = new JTextArea();
-        add(log);
+        add(new JScrollPane(log));
         add(createButtons(), BorderLayout.SOUTH);
     }
 
@@ -117,6 +122,9 @@ public class ServerWindow extends JFrame {
                     appendLog("Сервер уже был запущен");
                 } else {
                     work = true;
+                    serverController.setRunning(true);
+                    String history = readLog();  // Загружаем историю из лога
+                    serverController.loadChatHistory(history);
                     appendLog("Сервер запущен!");
                 }
             }
@@ -140,5 +148,10 @@ public class ServerWindow extends JFrame {
         panel.add(btnStart);
         panel.add(btnStop);
         return panel;
+    }
+
+    @Override
+    public void showMessage(String message) {
+
     }
 }

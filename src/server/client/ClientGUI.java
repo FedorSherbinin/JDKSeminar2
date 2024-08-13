@@ -31,7 +31,6 @@ public class ClientGUI extends JFrame implements ClientView{
     public ClientGUI() {
         setting();
         createPanel();
-
         setVisible(true);
     }
 
@@ -61,17 +60,17 @@ public class ClientGUI extends JFrame implements ClientView{
     }
 
     /**
-     * Метод, описывающий отключение клиента от сервера со стороны сервера
+     * Метод, описывающий отключение клиента от сервера со стороны сервера.
      */
     @Override
-    public void disconnectedFromServer(){
+    public void disconnectedFromServer() {
         hideHeaderPanel(true);
     }
 
     /**
-     * Метод, описывающий отключение клиента от сервера со стороны клиента
+     * Метод отключения клиента от сервера со стороны клиента.
      */
-    public void disconnectFromServer(){
+    public void disconnectFromServer() {
         clientController.disconnectFromServer();
     }
 
@@ -99,6 +98,11 @@ public class ClientGUI extends JFrame implements ClientView{
         clientController.message(tfMessage.getText());
         tfMessage.setText("");
     }
+
+    public void answer(String text) {
+        showMessage(text);
+    }
+
 
     /**
      * Метод добавления виджетов на экран
@@ -182,7 +186,7 @@ public class ClientGUI extends JFrame implements ClientView{
     protected void processWindowEvent(WindowEvent e) {
         super.processWindowEvent(e);
         if (e.getID() == WindowEvent.WINDOW_CLOSING){
-            this.disconnectedFromServer();
+            this.disconnectFromServer();
         }
     }
 }
