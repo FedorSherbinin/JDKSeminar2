@@ -1,94 +1,102 @@
 package server.server;
 
 import server.client.ClientController;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Класс для управления подключениями и взаимодействием с клиентами
+ * Класс ServerController управляет логикой работы сервера, подключением клиентов и обменом сообщениями.
  */
 public class ServerController {
-    // Пример хранилища для клиентов и истории сообщений
-    private List<ClientController> clients = new ArrayList<>();
-    private StringBuilder chatHistory = new StringBuilder();
-    private ServerView serverView;
-    private boolean isRunning;
+    private List<ClientController> clients = new ArrayList<>();  // Список подключенных клиентов
+    private StringBuilder chatHistory = new StringBuilder();  // Хранит историю сообщений чата
+    private ServerWindow serverView;  // GUI сервера
+    private boolean isRunning;  // Флаг работы сервера
 
-    // Устанавливает состояние сервера (работает/не работает)
+    /**
+     * Устанавливает состояние сервера (работает или нет).
+     * @param running true, если сервер работает, иначе false.
+     */
     public void setRunning(boolean running) {
         this.isRunning = running;
     }
 
-    // Проверяет, работает ли сервер
+    /**
+     * Проверяет, работает ли сервер.
+     * @return true, если сервер работает, иначе false.
+     */
     public boolean isRunning() {
         return isRunning;
     }
 
     /**
-     * Метод для установки ServerView
-     * @param serverView объект ServerView для отображения сообщений на серверном GUI
+     * Подключение клиента к серверу.
+     * @param client Клиент, который подключается.
+     * @return true, если подключение успешно, иначе false.
      */
-    public void setServerView(ServerView serverView) {
-        this.serverView = serverView;
+    public boolean connectUser(ClientController client) {
+        if (isRunning) { // Проверяем, работает ли сервер
+            if (!clients.contains(client)) { // Проверяем, не подключен ли уже клиент
+                clients.add(client);
+                return true;
+            }
+        }
+        return false; // Возвращаем false, если сервер не работает или клиент уже подключен
     }
 
     /**
-     * Метод для подключения пользователя
-     * @param client клиент, который пытается подключиться
-     * @return true, если подключение успешно, иначе false
+     * Отключение клиента от сервера.
+     * @param client Клиент, который отключается.
      */
-    public boolean connectUser(ClientController client) {
-        // Проверка, не подключен ли уже клиент
-        if (!clients.contains(client)) {
-            clients.add(client);
-            return true;
-        } else {
-            return false;
+    public void disconnectUser(ClientController client) {
+        clients.remove(client);  // Удаляем клиента из списка
+        client.disconnectedFromServer();  // Уведомляем клиента об отключении
+        if (serverView != null) {
+            serverView.disconnectUser(client);  // Обновляем GUI сервера
         }
     }
 
     /**
-     * Метод для отключения пользователя
-     * @param client клиент, который хочет отключиться
-     */
-    public void disconnectUser(ClientController client) {
-        clients.remove(client);
-        client.disconnectedFromServer(); // Уведомляем клиента об отключении
-    }
-
-    /**
-     * Метод для получения истории чата
-     * @return строка с историей сообщений
+     * Возвращает историю сообщений чата.
+     * @return История сообщений в виде строки.
      */
     public String getHistory() {
         return chatHistory.toString();
     }
 
     /**
-     * Метод для передачи сообщения от клиента всем подключенным клиентам
-     * @param message сообщение от клиента
+     * Метод для обработки сообщений от клиентов и рассылки их всем подключенным клиентам.
+     * @param message Текст сообщения.
      */
     public void message(String message) {
-        if (!isRunning) {
-            return;  // Если сервер не работает, ничего не делаем
+        if (!isRunning) { // Проверяем, работает ли сервер
+            return;
         }
 
-        // Сохраняем сообщение в истории
-        chatHistory.append(message).append("\n");
+        chatHistory.append(message).append("\n"); // Добавляем сообщение в историю чата
 
-        // Отправляем сообщение всем подключенным клиентам
         for (ClientController client : clients) {
-            client.answerFromServer(message);
+            client.answerFromServer(message);  // Отправляем сообщение всем подключенным клиентам
         }
+
         if (serverView != null) {
-            serverView.showMessage(message);  // Отправка сообщения на GUI сервера
+            serverView.message(message);  // Обновляем GUI сервера
         }
     }
 
-    // Загрузка истории чата при старте сервера
-    public void loadChatHistory(String history) {
-        chatHistory = new StringBuilder(history);
+    /**
+     * Устанавливает GUI сервера.
+     * @param serverView GUI сервера.
+     */
+    public void setServerView(ServerWindow serverView) {
+        this.serverView = serverView;
     }
 
+    /**
+     * Загружает историю чата из строки.
+     * @param history История чата в виде строки.
+     */
+    public void loadChatHistory(String history) {
+        chatHistory = new StringBuilder(history);  // Инициализируем историю чата
+    }
 }
