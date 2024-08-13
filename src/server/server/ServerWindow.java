@@ -1,6 +1,6 @@
 package server.server;
 
-import server.client.ClientGUI;
+import server.client.ClientController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,150 +8,198 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-//класс требуется разделить на GUI, controller и repository (смотри схему проекта)
-public class ServerWindow extends JFrame implements ServerView {
+/**
+ * Класс ServerWindow представляет графический интерфейс (GUI) сервера.
+ * Включает функции для управления подключениями клиентов и обработки сообщений.
+ */
+public class ServerWindow extends JFrame {
     public static final int WIDTH = 400;
     public static final int HEIGHT = 300;
-    public static final String LOG_PATH = "src/server/log.txt";
+    public static final String LOG_PATH = "src/server/log.txt"; // Путь к файлу для хранения истории чата
 
-    List<ClientGUI> clientGUIList;
-    JButton btnStart, btnStop;
-    JTextArea log;
-    boolean work;
-    private ServerController serverController;
+    private List<ClientController> clientControllers;  // Список всех подключенных клиентов
+    private JButton btnStart, btnStop;
+    private JTextArea log;
+    private boolean work;  // Указывает, запущен ли сервер
+    private ServerController serverController;  // Контроллер для управления сервером
 
-
-    public ServerWindow(){
-        clientGUIList = new ArrayList<>();
+    /**
+     * Конструктор ServerWindow создает GUI сервера и инициализирует основные компоненты.
+     */
+    public ServerWindow() {
+        clientControllers = new ArrayList<>();
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(WIDTH, HEIGHT);
         setResizable(false);
         setTitle("Chat server");
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(null); // Центрирует окно на экране
 
         createPanel();
 
         setVisible(true);
     }
 
-    // Устанавливаем контроллер сервера
+    /**
+     * Устанавливает контроллер сервера.
+     * @param serverController Контроллер для управления сервером.
+     */
     public void setServerController(ServerController serverController) {
         this.serverController = serverController;
     }
 
-    public boolean connectUser(ClientGUI clientGUI){
-        if (!work){
+    /**
+     * Метод подключения клиента к серверу.
+     * @param clientController Клиент, который пытается подключиться.
+     * @return true, если подключение успешно, иначе false.
+     */
+    public boolean connectUser(ClientController clientController) {
+        if (!work) { // Если сервер не работает, подключение не разрешено
             return false;
         }
-        clientGUIList.add(clientGUI);
+        clientControllers.add(clientController);  // Добавляем клиента в список подключенных клиентов
         return true;
     }
 
+    /**
+     * Получение логов сервера (истории сообщений).
+     * @return История сообщений в виде строки.
+     */
     public String getLog() {
         return readLog();
     }
 
-    public void disconnectUser(ClientGUI clientGUI){
-        clientGUIList.remove(clientGUI);
-        if (clientGUI != null){
-            clientGUI.disconnectedFromServer();
+    /**
+     * Отключение клиента от сервера.
+     * @param clientController Клиент, который отключается.
+     */
+    public void disconnectUser(ClientController clientController) {
+        clientControllers.remove(clientController);  // Удаляем клиента из списка
+        if (clientController != null) {
+            clientController.disconnectedFromServer();  // Уведомляем клиента об отключении
         }
     }
 
-    public void message(String text){
-        if (!work){
+    /**
+     * Метод для отправки сообщения от клиента на сервер и всем подключенным клиентам.
+     * @param text Текст сообщения.
+     */
+    public void message(String text) {
+        if (!work) { // Если сервер не работает, сообщения не обрабатываются
             return;
         }
-        appendLog(text);
-        answerAll(text);
-        saveInLog(text);
+        appendLog(text); // Добавляем сообщение в лог (на GUI)
+        answerAll(text); // Рассылаем сообщение всем клиентам
+        saveInLog(text); // Сохраняем сообщение в файл
     }
 
-    private void answerAll(String text){
-        for (ClientGUI clientGUI: clientGUIList){
-            clientGUI.answer(text);
+    /**
+     * Метод для отправки сообщения всем подключенным клиентам.
+     * @param text Текст сообщения.
+     */
+    private void answerAll(String text) {
+        for (ClientController clientController : clientControllers) {
+            clientController.answerFromServer(text); // Отправляем сообщение каждому клиенту
         }
     }
 
-    private void saveInLog(String text){
-        try (FileWriter writer = new FileWriter(LOG_PATH, true)){
-            writer.write(text);
-            writer.write("\n");
-        } catch (Exception e){
+    /**
+     * Сохранение сообщения в лог-файл.
+     * @param text Текст сообщения.
+     */
+    private void saveInLog(String text) {
+        try (FileWriter writer = new FileWriter(LOG_PATH, true)) {
+            writer.write(text + "\n");
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private String readLog(){
+    /**
+     * Чтение истории сообщений из лог-файла.
+     * @return История сообщений в виде строки.
+     */
+    private String readLog() {
         StringBuilder stringBuilder = new StringBuilder();
-        try (FileReader reader = new FileReader(LOG_PATH)){
+        try (FileReader reader = new FileReader(LOG_PATH)) {
             int c;
-            while ((c = reader.read()) != -1){
+            while ((c = reader.read()) != -1) {
                 stringBuilder.append((char) c);
             }
-            stringBuilder.delete(stringBuilder.length()-1, stringBuilder.length());
             return stringBuilder.toString();
-        } catch (Exception e){
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    private void appendLog(String text){
+    /**
+     * Добавление сообщения в лог на GUI.
+     * @param text Текст сообщения.
+     */
+    private void appendLog(String text) {
         log.append(text + "\n");
     }
 
+    /**
+     * Создание панели с текстовым полем и кнопками.
+     */
     private void createPanel() {
         log = new JTextArea();
-        add(new JScrollPane(log));
-        add(createButtons(), BorderLayout.SOUTH);
+        add(new JScrollPane(log)); // Добавляем скроллбар для текстового поля
+        add(createButtons(), BorderLayout.SOUTH); // Добавляем панель с кнопками внизу
     }
 
+    /**
+     * Создание панели с кнопками "Start" и "Stop".
+     * @return Компонент панели с кнопками.
+     */
     private Component createButtons() {
         JPanel panel = new JPanel(new GridLayout(1, 2));
         btnStart = new JButton("Start");
         btnStop = new JButton("Stop");
 
+        // Обработчик для кнопки "Start"
         btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (work){
+                if (work) {
                     appendLog("Сервер уже был запущен");
                 } else {
                     work = true;
-                    serverController.setRunning(true);
-                    String history = readLog();  // Загружаем историю из лога
-                    serverController.loadChatHistory(history);
+                    serverController.setRunning(true); // Устанавливаем сервер в состояние работы
+                    String history = readLog(); // Загружаем историю сообщений
+                    if (history != null && !history.isEmpty()) {
+                        serverController.loadChatHistory(history); // Загружаем историю чата в контроллер сервера
+                        appendLog(history); // Отображаем историю на GUI
+                    }
                     appendLog("Сервер запущен!");
                 }
             }
         });
 
+        // Обработчик для кнопки "Stop"
         btnStop.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!work){
+                if (!work) {
                     appendLog("Сервер уже был остановлен");
                 } else {
                     work = false;
-                    while (!clientGUIList.isEmpty()){
-                        disconnectUser(clientGUIList.get(clientGUIList.size()-1));
+                    serverController.setRunning(false); // Останавливаем сервер
+                    while (!clientControllers.isEmpty()) {
+                        disconnectUser(clientControllers.get(clientControllers.size() - 1)); // Отключаем всех клиентов
                     }
                     appendLog("Сервер остановлен!");
                 }
             }
         });
 
-        panel.add(btnStart);
-        panel.add(btnStop);
+        panel.add(btnStart); // Добавляем кнопку "Start" на панель
+        panel.add(btnStop); // Добавляем кнопку "Stop" на панель
         return panel;
-    }
-
-    @Override
-    public void showMessage(String message) {
-
     }
 }
