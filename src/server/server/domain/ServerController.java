@@ -31,6 +31,11 @@ public class ServerController {
         if (isRunning) {
             if (!clients.contains(client)) {
                 clients.add(client);
+                // Логируем информацию о подключении пользователя, но не сохраняем в файл
+                String connectionMessage = client.getName() + " подключился к серверу.";
+                if (serverView != null) {
+                    serverView.showMessage(connectionMessage);
+                }
                 return true;
             }
         }

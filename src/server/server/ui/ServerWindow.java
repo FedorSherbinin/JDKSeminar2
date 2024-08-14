@@ -20,7 +20,6 @@ import java.util.List;
 public class ServerWindow extends JFrame {
     public static final int WIDTH = 400;
     public static final int HEIGHT = 300;
-//    public static final String LOG_PATH = "src/server/history.txt"; // Путь к файлу для хранения истории чата
 
     private List<ClientController> clientControllers;  // Список всех подключенных клиентов
     private JButton btnStart, btnStop;
@@ -65,13 +64,6 @@ public class ServerWindow extends JFrame {
         return true;
     }
 
-    /**
-     * Получение логов сервера (истории сообщений).
-     * @return История сообщений в виде строки.
-     */
-//    public String getLog() {
-//        return readLog();
-//    }
 
     /**
      * Отключение клиента от сервера.
@@ -97,6 +89,11 @@ public class ServerWindow extends JFrame {
 //        saveInLog(text); // Сохраняем сообщение в файл
     }
 
+    public void showMessage(String message) {
+        appendLog(message);
+    }
+
+
     /**
      * Метод для отправки сообщения всем подключенным клиентам.
      * @param text Текст сообщения.
@@ -107,35 +104,6 @@ public class ServerWindow extends JFrame {
         }
     }
 
-//    /**
-//     * Сохранение сообщения в лог-файл.
-//     * @param text Текст сообщения.
-//     */
-//    private void saveInLog(String text) {
-//        try (FileWriter writer = new FileWriter(LOG_PATH, true)) {
-//            writer.write(text + "\n");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    /**
-//     * Чтение истории сообщений из лог-файла.
-//     * @return История сообщений в виде строки.
-//     */
-//    private String readLog() {
-//        StringBuilder stringBuilder = new StringBuilder();
-//        try (FileReader reader = new FileReader(LOG_PATH)) {
-//            int c;
-//            while ((c = reader.read()) != -1) {
-//                stringBuilder.append((char) c);
-//            }
-//            return stringBuilder.toString();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
 
     /**
      * Добавление сообщения в лог на GUI.

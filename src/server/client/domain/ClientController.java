@@ -68,4 +68,10 @@ public class ClientController {
     private void showOnWindow(String text) {
         clientView.showMessage(text);
     }
+
+    public String getName() {
+        return name;
+    }
+
+
 }
