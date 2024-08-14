@@ -20,7 +20,7 @@ import java.util.List;
 public class ServerWindow extends JFrame {
     public static final int WIDTH = 400;
     public static final int HEIGHT = 300;
-    public static final String LOG_PATH = "src/server/log.txt"; // Путь к файлу для хранения истории чата
+//    public static final String LOG_PATH = "src/server/history.txt"; // Путь к файлу для хранения истории чата
 
     private List<ClientController> clientControllers;  // Список всех подключенных клиентов
     private JButton btnStart, btnStop;
@@ -69,9 +69,9 @@ public class ServerWindow extends JFrame {
      * Получение логов сервера (истории сообщений).
      * @return История сообщений в виде строки.
      */
-    public String getLog() {
-        return readLog();
-    }
+//    public String getLog() {
+//        return readLog();
+//    }
 
     /**
      * Отключение клиента от сервера.
@@ -94,7 +94,7 @@ public class ServerWindow extends JFrame {
         }
         appendLog(text); // Добавляем сообщение в лог (на GUI)
         answerAll(text); // Рассылаем сообщение всем клиентам
-        saveInLog(text); // Сохраняем сообщение в файл
+//        saveInLog(text); // Сохраняем сообщение в файл
     }
 
     /**
@@ -107,35 +107,35 @@ public class ServerWindow extends JFrame {
         }
     }
 
-    /**
-     * Сохранение сообщения в лог-файл.
-     * @param text Текст сообщения.
-     */
-    private void saveInLog(String text) {
-        try (FileWriter writer = new FileWriter(LOG_PATH, true)) {
-            writer.write(text + "\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Чтение истории сообщений из лог-файла.
-     * @return История сообщений в виде строки.
-     */
-    private String readLog() {
-        StringBuilder stringBuilder = new StringBuilder();
-        try (FileReader reader = new FileReader(LOG_PATH)) {
-            int c;
-            while ((c = reader.read()) != -1) {
-                stringBuilder.append((char) c);
-            }
-            return stringBuilder.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+//    /**
+//     * Сохранение сообщения в лог-файл.
+//     * @param text Текст сообщения.
+//     */
+//    private void saveInLog(String text) {
+//        try (FileWriter writer = new FileWriter(LOG_PATH, true)) {
+//            writer.write(text + "\n");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    /**
+//     * Чтение истории сообщений из лог-файла.
+//     * @return История сообщений в виде строки.
+//     */
+//    private String readLog() {
+//        StringBuilder stringBuilder = new StringBuilder();
+//        try (FileReader reader = new FileReader(LOG_PATH)) {
+//            int c;
+//            while ((c = reader.read()) != -1) {
+//                stringBuilder.append((char) c);
+//            }
+//            return stringBuilder.toString();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 
     /**
      * Добавление сообщения в лог на GUI.
@@ -163,7 +163,6 @@ public class ServerWindow extends JFrame {
         btnStart = new JButton("Start");
         btnStop = new JButton("Stop");
 
-        // Обработчик для кнопки "Start"
         btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -171,18 +170,16 @@ public class ServerWindow extends JFrame {
                     appendLog("Сервер уже был запущен");
                 } else {
                     work = true;
-                    serverController.setRunning(true); // Устанавливаем сервер в состояние работы
-                    String history = readLog(); // Загружаем историю сообщений
-                    if (history != null && !history.isEmpty()) {
-                        serverController.loadChatHistory(history); // Загружаем историю чата в контроллер сервера
-                        appendLog(history); // Отображаем историю на GUI
-                    }
+                    serverController.setRunning(true);
+
+                    // Загрузка истории чата из репозитория
+                    serverController.loadHistoryFromRepository();
+
                     appendLog("Сервер запущен!");
                 }
             }
         });
 
-        // Обработчик для кнопки "Stop"
         btnStop.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -190,17 +187,17 @@ public class ServerWindow extends JFrame {
                     appendLog("Сервер уже был остановлен");
                 } else {
                     work = false;
-                    serverController.setRunning(false); // Останавливаем сервер
+                    serverController.setRunning(false);
                     while (!clientControllers.isEmpty()) {
-                        disconnectUser(clientControllers.get(clientControllers.size() - 1)); // Отключаем всех клиентов
+                        disconnectUser(clientControllers.get(clientControllers.size() - 1));
                     }
                     appendLog("Сервер остановлен!");
                 }
             }
         });
 
-        panel.add(btnStart); // Добавляем кнопку "Start" на панель
-        panel.add(btnStop); // Добавляем кнопку "Stop" на панель
+        panel.add(btnStart);
+        panel.add(btnStop);
         return panel;
     }
 }

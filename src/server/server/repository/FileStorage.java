@@ -1,5 +1,6 @@
 package server.server.repository;
 
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,12 +14,14 @@ public class FileStorage implements Repository {
 
     @Override
     public void save(String data) {
-        try (FileWriter writer = new FileWriter(filePath, true)) {
+        try (FileWriter writer = new FileWriter(filePath, true)) { // Используем параметр 'true' для добавления
             writer.write(data + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
 
     @Override
     public String load() {

@@ -10,7 +10,7 @@ import server.server.ui.ServerWindow;
 public class Main {
     public static void main(String[] args) {
         // Создание хранилища и контроллера сервера
-        Repository fileStorage = new FileStorage("src/server/log.txt");
+        Repository fileStorage = new FileStorage("src/server/server/repository/history.txt");
         ServerController serverController = new ServerController(fileStorage);
 
         // Создание объектов сервера и связывание их

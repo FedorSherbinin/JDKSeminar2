@@ -55,7 +55,7 @@ public class ServerController {
         }
 
         chatHistory.append(message).append("\n");
-        repository.save(message);  // Сохраняем сообщение через репозиторий
+        repository.save(message);  // Сохранение сообщения через репозиторий
 
         for (ClientController client : clients) {
             client.answerFromServer(message);
@@ -65,6 +65,7 @@ public class ServerController {
             serverView.message(message);
         }
     }
+
 
     public void setServerView(ServerWindow serverView) {
         this.serverView = serverView;
