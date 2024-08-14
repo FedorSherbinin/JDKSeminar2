@@ -1,6 +1,7 @@
-package server.server;
+package server.server.ui;
 
-import server.client.ClientController;
+import server.client.domain.ClientController;
+import server.server.domain.ServerController;
 
 import javax.swing.*;
 import java.awt.*;

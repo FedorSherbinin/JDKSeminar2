@@ -1,27 +1,34 @@
 package server;
 
-import server.client.ClientController;
-import server.client.ClientGUI;
-import server.server.ServerController;
-import server.server.ServerWindow;
+import server.client.domain.ClientController;
+import server.client.ui.ClientGUI;
+import server.server.repository.FileStorage;
+import server.server.repository.Repository;
+import server.server.domain.ServerController;
+import server.server.ui.ServerWindow;
 
 public class Main {
     public static void main(String[] args) {
+        // Создание хранилища и контроллера сервера
+        Repository fileStorage = new FileStorage("src/server/log.txt");
+        ServerController serverController = new ServerController(fileStorage);
 
-        //создание объектов сервера и создание связи между ними
+        // Создание объектов сервера и связывание их
         ServerWindow serverWindow = new ServerWindow();
-        ServerController serverController = new ServerController();
         serverController.setServerView(serverWindow);
         serverWindow.setServerController(serverController);
 
-        //создание объектов клиента1 и создание связи между ними
+        // Загрузка истории чата
+        serverController.loadHistoryFromRepository();
+
+        // Создание объектов клиента1 и связывание их
         ClientGUI clientGUI1 = new ClientGUI();
         ClientController clientController1 = new ClientController();
         clientController1.setClientView(clientGUI1);
         clientGUI1.setClient(clientController1);
         clientController1.setServer(serverController);
 
-        //создание объектов клиента2 и создание связи между ними
+        // Создание объектов клиента2 и связывание их
         ClientGUI clientGUI2 = new ClientGUI();
         ClientController clientController2 = new ClientController();
         clientController2.setClientView(clientGUI2);

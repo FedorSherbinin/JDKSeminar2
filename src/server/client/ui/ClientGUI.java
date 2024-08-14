@@ -1,4 +1,6 @@
-package server.client;
+package server.client.ui;
+
+import server.client.domain.ClientController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,7 +10,7 @@ import java.awt.event.*;
  * Класс описывающий работу графического интерфейса приложения.
  * Является абстракцией GUI
  */
-public class ClientGUI extends JFrame implements ClientView{
+public class ClientGUI extends JFrame implements ClientView {
     private static final int WIDTH = 400;
     private static final int HEIGHT = 300;
 

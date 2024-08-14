@@ -1,6 +1,7 @@
-package server.client;
+package server.client.domain;
 
-import server.server.ServerController;
+import server.client.ui.ClientView;
+import server.server.domain.ServerController;
 
 public class ClientController {
     private boolean connected;

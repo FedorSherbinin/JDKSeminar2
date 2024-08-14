@@ -1,4 +1,4 @@
-package server.client;
+package server.client.ui;
 
 /**
  * Интерфейс описывающий абстракцию GUI
